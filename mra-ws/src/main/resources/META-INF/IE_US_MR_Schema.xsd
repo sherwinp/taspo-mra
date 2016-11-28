@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="urn:IE_US_MR_Schema" xmlns:icd="urn:IE_US_MR_Schema" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:IE_US_MR_Schema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+  <xs:complexType name="AEOieType">
+    <xs:sequence>
+      <xs:element name="Version" type="VersionType" fixed="2"/>
+      <xs:element name="SendingOrganization" type="OrganizationType"/>
+      <xs:element name="ReceivingOrganization" type="OrganizationType"/>
+      <xs:element name="SendingDateTime" type="xs:dateTime"/>
+      <xs:element name="SequenceNumber" type="SequenceNumberType"/>
+      <xs:element name="ExtractionType" type="ExtractionTypeType"/>
+      <xs:element name="MessageID" type="GUID"/>
+      <xs:element name="AEO" type="AEOType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResultType">
+    <xs:sequence>
+      <xs:element name="Version" type="VersionType" fixed="2"/>
+      <xs:element name="SendingOrganization" type="OrganizationType"/>
+      <xs:element name="ReceivingOrganization" type="OrganizationType"/>
+      <xs:element name="SendingDateTime" type="xs:dateTime"/>
+      <xs:element name="MessageID" type="GUID"/>
+      <xs:element name="ReferenceMessageID" type="GUID"/>
+      <xs:element name="ReferenceSequenceNumber" type="SequenceNumberType"/>
+      <xs:element name="ReferenceExtractionType" type="ExtractionTypeType"/>
+      <xs:element name="Accepted" type="xs:boolean"/>
+      <xs:element name="Remark" type="RemarkType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Transaction" type="TransactionType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RemarkType">
+    <xs:sequence>
+      <xs:element name="StatusType" type="ResultStatusType"/>
+      <xs:element name="StatusCode" type="ResultStatusCodeType" minOccurs="0"/>
+      <xs:element name="StatusDetail" type="StatusDetailType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TransactionType">
+    <xs:sequence>
+      <xs:element name="TransactionID" type="TransactionIDType"/>
+      <xs:element name="Accepted" type="xs:boolean"/>
+      <xs:element name="Remark" type="RemarkType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EnvelopeType">
+    <xs:choice>
+      <xs:element name="AEOie" type="AEOieType">
+        <xs:unique name="AEOieTransactionKey">
+          <xs:selector xpath="./icd:AEO"/>
+          <xs:field xpath="icd:TransactionID"/>
+        </xs:unique>
+      </xs:element>
+      <xs:element name="USmid" type="USmidType">
+        <xs:unique name="USmidTransactionKey">
+          <xs:selector xpath="./icd:AEO"/>
+          <xs:field xpath="icd:TransactionID"/>
+        </xs:unique>
+      </xs:element>
+      <xs:element name="Result" type="ResultType">
+        <xs:unique name="ResultTransactionKey">
+          <xs:selector xpath="./icd:Transaction"/>
+          <xs:field xpath="icd:TransactionID"/>
+        </xs:unique>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="Envelope" type="EnvelopeType"/>
+  <xs:complexType name="USmidType">
+    <xs:sequence>
+      <xs:element name="Version" type="VersionType" fixed="2"/>
+      <xs:element name="SendingOrganization" type="OrganizationType" fixed="US"/>
+      <xs:element name="ReceivingOrganization" type="OrganizationType"/>
+      <xs:element name="SendingDateTime" type="xs:dateTime"/>
+      <xs:element name="SequenceNumber" type="SequenceNumberType"/>
+      <xs:element name="ExtractionType" type="ExtractionTypeType"/>
+      <xs:element name="MessageID" type="GUID"/>
+      <xs:element name="AEO" type="USmidAEOType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="AEOCertificateTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="S"/>
+      <xs:enumeration value="F"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="USmidAEOType">
+    <xs:sequence>
+      <xs:element name="TransactionID" type="TransactionIDType"/>
+      <xs:element name="Operation" type="OperationType"/>
+      <xs:element name="TIN" type="TINType"/>
+      <xs:element name="MID" type="MIDType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NameType">
+    <xs:sequence>
+      <xs:element name="LanguageCode" type="LanguageCodeType"/>
+      <xs:element name="FullName" type="FullNameType"/>
+      <xs:element name="ShortName" type="ShortNameType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AddressType">
+    <xs:sequence>
+      <xs:element name="StreetAndNumber">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="35"/>
+            <xs:pattern value="[&#x0021;-&#x007E;]+|[&#x0021;-&#x007E;]{1}[&#x0020;-&#x007E;]+[&#x0021;-&#x007E;]{1}"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="Postcode" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="SingleLineString">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="9"/>
+            <xs:pattern value="\p{IsBasicLatin}+"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="City">
+        <xs:simpleType>
+          <xs:restriction base="SingleLineString">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="35"/>
+            <xs:pattern value="[&#x0021;-&#x007E;]+|[&#x0021;-&#x007E;]{1}[&#x0020;-&#x007E;]+[&#x0021;-&#x007E;]{1}"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="CountryCode" type="CountryCodeType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="LifecycleEventType">
+    <xs:sequence>
+      <xs:element name="StartDate" type="xs:date"/>
+      <xs:element name="EndDate" type="xs:date" minOccurs="0"/>
+      <xs:element name="CertificateStatus" type="CertificateStatusType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AEOType">
+    <xs:sequence>
+      <xs:element name="TransactionID" type="TransactionIDType"/>
+      <xs:element name="Operation" type="OperationType"/>
+      <xs:element name="CertificateType" type="AEOCertificateTypeType"/>
+      <xs:element name="Name" type="NameType"/>
+      <xs:element name="TIN" type="TINType"/>
+      <xs:element name="Address" type="AddressType"/>
+      <xs:element name="LifecycleEvent" type="LifecycleEventType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="MIDType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z]{2}[a-zA-Z0-9]{0,13}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="TINType">
+    <xs:sequence>
+      <xs:element name="CountryCode" type="CountryCodeType"/>
+      <xs:element name="TNI" type="TNIType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="ResultStatusCodeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="E00001"/>
+      <xs:enumeration value="E00002"/>
+      <xs:enumeration value="W00003"/>
+      <xs:enumeration value="I10001"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ResultStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="E"/>
+      <xs:enumeration value="W"/>
+      <xs:enumeration value="I"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ExtractionTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="F"/>
+      <xs:enumeration value="D"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SequenceNumberType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{6}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VersionType">
+    <xs:restriction base="xs:integer">
+      <xs:totalDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CertificateStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="C"/>
+      <xs:enumeration value="S"/>
+      <xs:enumeration value="R"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LanguageCodeType">
+    <xs:restriction base="xs:string">
+      <xs:length value="2"/>
+      <xs:pattern value="[a-z][a-z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FullNameType">
+    <xs:restriction base="SingleLineString">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="300"/>
+      <xs:pattern value="[&#x0021;-&#x007E;]+|[&#x0021;-&#x007E;]{1}[&#x0020;-&#x007E;]+[&#x0021;-&#x007E;]{1}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ShortNameType">
+    <xs:restriction base="SingleLineString">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="35"/>
+      <xs:pattern value="[&#x0021;-&#x007E;]+|[&#x0021;-&#x007E;]{1}[&#x0020;-&#x007E;]+[&#x0021;-&#x007E;]{1}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TransactionIDType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{10}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OperationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="C"/>
+      <xs:enumeration value="U"/>
+      <xs:enumeration value="D"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SingleLineString">
+    <xs:annotation>
+      <xs:documentation>
+        Single line string: Avoid presence of \n (new
+        line) and \r (return) characters in the string.
+        Note that pattern ".*" is equivalent.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[^\n\r]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OrganizationType">
+    <xs:restriction base="xs:string">
+      <xs:length value="2"/>
+      <xs:pattern value="[A-Z][A-Z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CountryCodeType">
+    <xs:annotation>
+      <xs:documentation>
+        Country code format
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="2"/>
+      <xs:pattern value="[A-Z][A-Z]"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TNIType">
+    <xs:restriction base="SingleLineString">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="15"/>
+      <xs:pattern value="[&#x0021;-&#x007E;]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StatusDetailType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0"/>
+      <xs:maxLength value="500"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GUID">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\})"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

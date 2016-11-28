@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Sun Nov 27 22:20:05 EST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-0158-a8f2-5b79-00000abfa6a8 
+on database directory /home/sherwinp/workspace/taspo-dm/demodb with class loader sun.misc.Launcher$AppClassLoader@18b4aac2 
+Loaded from file:/home/sherwinp/.m2/repository/org/apache/derby/derby/10.11.1.1/derby-10.11.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_111-8u111-b14-2ubuntu0.16.04.2-b14
+user.dir=/home/sherwinp/workspace/taspo-mra/mra-ws
+os.name=Linux
+os.arch=amd64
+os.version=4.4.0-47-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

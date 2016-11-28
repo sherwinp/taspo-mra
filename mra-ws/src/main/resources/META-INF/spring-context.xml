@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sws="http://www.springframework.org/schema/web-services"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<context:component-scan base-package="taspo.mra.ws" />
+	
+<task:annotation-driven />
+
+	<sws:annotation-driven />
+	
+	<sws:interceptors>
+		<bean
+			class="org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor">
+			<description>
+				This interceptor validates both incoming and outgoing
+				message contents
+				according to the 'echo.xsd' XML
+				Schema file.
+			</description>
+			<property name="schema" value="classpath:/META-INF/IE_US_MR_Schema.xsd" />
+			<property name="validateRequest" value="true" />
+			<property name="validateResponse" value="true" />
+		</bean>
+		<bean
+			class="org.springframework.ws.server.endpoint.interceptor.PayloadLoggingInterceptor">
+			<description>
+				This interceptor logs the message payload.
+			</description>
+		</bean>
+	</sws:interceptors>
+	<sws:dynamic-wsdl id="mra" serviceName="MRADataExchangeService"	portTypeName="SendMessagePort" locationUri="http://localhost:8080/services/mraDataExchange">
+		<sws:xsd location="classpath:/META-INF/IE_US_MR_Schema.xsd" />
+	</sws:dynamic-wsdl>
+	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+</beans>
